@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="萬用履歷產生器：即時預覽、多版型、JSON 備份與 PDF 匯出。" />
+  <meta name="theme-color" content="#0f766e" />
+  <title>萬用履歷產生器</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <noscript><div class="noscript">此工具需要 JavaScript 才能運作，請先在瀏覽器啟用 JavaScript。</div></noscript>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">R</div>
+      <div><h1>萬用履歷產生器</h1><p>即時編輯・ATS 友善・一鍵輸出 PDF</p></div>
+    </div>
+    <div class="top-actions" aria-label="履歷操作">
+      <span id="saveStatus" class="save-status" role="status">已自動儲存</span>
+      <button class="button button-ghost" id="loadSampleBtn" type="button">載入範例</button>
+      <button class="button button-ghost" id="exportJsonBtn" type="button">備份 JSON</button>
+      <label class="button button-ghost file-button" for="importJsonInput">匯入 JSON</label>
+      <input id="importJsonInput" type="file" accept="application/json,.json" hidden />
+      <button class="button button-primary" id="printBtn" type="button">匯出 PDF</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <aside class="editor-panel" aria-label="履歷編輯器">
+      <div class="mobile-panel-tabs" role="tablist" aria-label="手機版檢視切換">
+        <button class="mobile-tab is-active" type="button" data-mobile-view="editor" role="tab" aria-selected="true">編輯</button>
+        <button class="mobile-tab" type="button" data-mobile-view="preview" role="tab" aria-selected="false">預覽</button>
+      </div>
+
+      <section class="editor-intro">
+        <div><h2>建立你的履歷</h2><p>資料只會儲存在你的瀏覽器，不會上傳至伺服器。</p></div>
+        <button class="icon-button danger" id="resetBtn" type="button" title="清除全部資料" aria-label="清除全部資料">重設</button>
+      </section>
+
+      <nav class="section-nav" id="sectionNav" aria-label="編輯區段">
+        <button class="section-nav-item is-active" type="button" data-target="settingsSection">外觀</button>
+        <button class="section-nav-item" type="button" data-target="personalSection">基本資料</button>
+        <button class="section-nav-item" type="button" data-target="summarySection">專業摘要</button>
+        <button class="section-nav-item" type="button" data-target="experienceSection">工作經歷</button>
+        <button class="section-nav-item" type="button" data-target="educationSection">學歷</button>
+        <button class="section-nav-item" type="button" data-target="skillsSection">技能</button>
+        <button class="section-nav-item" type="button" data-target="projectsSection">專案</button>
+        <button class="section-nav-item" type="button" data-target="extrasSection">其他</button>
+      </nav>
+
+      <div class="editor-scroll" id="editorScroll">
+        <section class="form-card" id="settingsSection">
+          <div class="form-card-heading"><div><span class="eyebrow">STYLE</span><h3>外觀與版型</h3></div></div>
+          <div class="field-grid two-columns">
+            <label class="field"><span>履歷版型</span><select id="templateSelect" data-bind="settings.template"><option value="modern">現代雙欄</option><option value="classic">經典單欄</option><option value="minimal">極簡留白</option></select></label>
+            <label class="field"><span>字體大小</span><select id="fontScaleSelect" data-bind="settings.fontScale"><option value="compact">精簡</option><option value="normal">標準</option><option value="comfortable">舒適</option></select></label>
+          </div>
+          <div class="field-grid two-columns">
+            <label class="field"><span>主題色</span><div class="color-field"><input id="accentColorInput" type="color" value="#0f766e" data-bind="settings.accentColor" /><input id="accentColorText" type="text" value="#0f766e" maxlength="7" aria-label="主題色色碼" /></div></label>
+            <label class="field"><span>履歷語言</span><select data-bind="settings.language"><option value="zh">繁體中文</option><option value="en">English</option></select></label>
+          </div>
+          <div class="switch-list">
+            <label class="switch-row"><span><strong>顯示個人照片</strong><small>ATS 投遞時可關閉照片</small></span><input type="checkbox" data-bind="settings.showPhoto" /></label>
+            <label class="switch-row"><span><strong>顯示圖示</strong><small>關閉後更適合純文字解析系統</small></span><input type="checkbox" data-bind="settings.showIcons" /></label>
+          </div>
+        </section>
+
+        <section class="form-card" id="personalSection">
+          <div class="form-card-heading"><div><span class="eyebrow">PROFILE</span><h3>基本資料</h3></div></div>
+          <div class="photo-uploader"><div class="photo-preview" id="photoPreview" aria-label="個人照片預覽">照片</div><div><label class="button button-secondary file-button" for="photoInput">上傳照片</label><input id="photoInput" type="file" accept="image/png,image/jpeg,image/webp" hidden /><button class="text-button" id="removePhotoBtn" type="button">移除照片</button><p>建議使用正方形 JPG、PNG 或 WebP，檔案小於 2 MB。</p></div></div>
+          <div class="field-grid two-columns"><label class="field"><span>姓名 *</span><input type="text" placeholder="王小明" data-bind="personal.name" /></label><label class="field"><span>職稱 / 目標職位</span><input type="text" placeholder="前端工程師" data-bind="personal.title" /></label></div>
+          <div class="field-grid two-columns"><label class="field"><span>電子信箱</span><input type="email" placeholder="name@example.com" data-bind="personal.email" /></label><label class="field"><span>電話</span><input type="tel" placeholder="0912-345-678" data-bind="personal.phone" /></label></div>
+          <div class="field-grid two-columns"><label class="field"><span>所在地</span><input type="text" placeholder="台中市，台灣" data-bind="personal.location" /></label><label class="field"><span>個人網站</span><input type="url" placeholder="https://your-site.com" data-bind="personal.website" /></label></div>
+          <div class="field-grid two-columns"><label class="field"><span>LinkedIn</span><input type="text" placeholder="linkedin.com/in/username" data-bind="personal.linkedin" /></label><label class="field"><span>GitHub / 作品集</span><input type="text" placeholder="github.com/username" data-bind="personal.github" /></label></div>
+        </section>
+
+        <section class="form-card" id="summarySection">
+          <div class="form-card-heading"><div><span class="eyebrow">ABOUT</span><h3>專業摘要</h3></div><label class="mini-switch" title="顯示專業摘要"><input type="checkbox" data-visibility="summary" /><span>顯示</span></label></div>
+          <label class="field"><span>用 2–4 句說明你的專業、成果與求職方向</span><textarea rows="6" placeholder="具備 3 年網站開發經驗，擅長……" data-bind="summary"></textarea><small class="field-hint"><span id="summaryCount">0</span> 字</small></label>
+        </section>
+
+        <section class="form-card" id="experienceSection">
+          <div class="form-card-heading"><div><span class="eyebrow">EXPERIENCE</span><h3>工作經歷</h3></div><div class="heading-actions"><label class="mini-switch"><input type="checkbox" data-visibility="experience" /><span>顯示</span></label><button class="button button-small button-secondary" type="button" data-add-item="experience">＋ 新增</button></div></div>
+          <div class="dynamic-list" id="experienceList"></div>
+        </section>
+
+        <section class="form-card" id="educationSection">
+          <div class="form-card-heading"><div><span class="eyebrow">EDUCATION</span><h3>學歷</h3></div><div class="heading-actions"><label class="mini-switch"><input type="checkbox" data-visibility="education" /><span>顯示</span></label><button class="button button-small button-secondary" type="button" data-add-item="education">＋ 新增</button></div></div>
+          <div class="dynamic-list" id="educationList"></div>
+        </section>
+
+        <section class="form-card" id="skillsSection">
+          <div class="form-card-heading"><div><span class="eyebrow">SKILLS</span><h3>技能</h3></div><label class="mini-switch"><input type="checkbox" data-visibility="skills" /><span>顯示</span></label></div>
+          <label class="field"><span>每行一項技能，可使用「分類：技能」格式</span><textarea rows="7" placeholder="前端：HTML、CSS、JavaScript&#10;框架：React、Vue&#10;工具：Git、Figma" data-bind="skills"></textarea></label>
+        </section>
+
+        <section class="form-card" id="projectsSection">
+          <div class="form-card-heading"><div><span class="eyebrow">PROJECTS</span><h3>專案作品</h3></div><div class="heading-actions"><label class="mini-switch"><input type="checkbox" data-visibility="projects" /><span>顯示</span></label><button class="button button-small button-secondary" type="button" data-add-item="projects">＋ 新增</button></div></div>
+          <div class="dynamic-list" id="projectsList"></div>
+        </section>
+
+        <section class="form-card" id="extrasSection">
+          <div class="form-card-heading"><div><span class="eyebrow">MORE</span><h3>其他資訊</h3></div></div>
+          <div class="subsection-heading"><div><h4>證照與獎項</h4><label class="mini-switch"><input type="checkbox" data-visibility="certifications" /><span>顯示</span></label></div><button class="button button-small button-secondary" type="button" data-add-item="certifications">＋ 新增</button></div>
+          <div class="dynamic-list" id="certificationsList"></div>
+          <div class="subsection-divider"></div>
+          <div class="subsection-heading"><div><h4>語言能力</h4><label class="mini-switch"><input type="checkbox" data-visibility="languages" /><span>顯示</span></label></div><button class="button button-small button-secondary" type="button" data-add-item="languages">＋ 新增</button></div>
+          <div class="dynamic-list" id="languagesList"></div>
+          <div class="subsection-divider"></div>
+          <div class="subsection-heading"><div><h4>自訂區段</h4><label class="mini-switch"><input type="checkbox" data-visibility="custom" /><span>顯示</span></label></div></div>
+          <div class="field-grid two-columns"><label class="field"><span>區段標題</span><input type="text" placeholder="志工經驗" data-bind="custom.title" /></label><label class="field"><span>呈現方式</span><select data-bind="custom.format"><option value="bullets">條列</option><option value="paragraph">段落</option></select></label></div>
+          <label class="field"><span>內容</span><textarea rows="6" placeholder="每行一項內容，或輸入一段文字。" data-bind="custom.content"></textarea></label>
+        </section>
+      </div>
+    </aside>
+
+    <section class="preview-panel" id="previewPanel" aria-label="履歷預覽">
+      <div class="preview-toolbar"><div><strong>即時預覽</strong><span id="pageEstimate">預估 1 頁</span></div><div class="zoom-controls" aria-label="預覽縮放"><button class="icon-button" id="zoomOutBtn" type="button" aria-label="縮小">−</button><span id="zoomValue">85%</span><button class="icon-button" id="zoomInBtn" type="button" aria-label="放大">＋</button><button class="icon-button" id="fitBtn" type="button" aria-label="符合視窗">適合</button></div></div>
+      <div class="preview-stage" id="previewStage"><article class="resume-paper template-modern scale-normal" id="resumePreview"></article></div>
+    </section>
+  </main>
+
+  <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+
+  <template id="experienceItemTemplate">
+    <article class="dynamic-item" data-item-type="experience"><div class="dynamic-item-header"><strong>工作經歷</strong><div class="item-actions"><button type="button" class="move-button" data-move="up" title="往上移">↑</button><button type="button" class="move-button" data-move="down" title="往下移">↓</button><button type="button" class="remove-button" data-remove-item title="刪除">刪除</button></div></div><div class="field-grid two-columns"><label class="field"><span>公司 / 組織</span><input type="text" data-item-field="company" placeholder="星火科技有限公司" /></label><label class="field"><span>職稱</span><input type="text" data-item-field="role" placeholder="前端工程師" /></label></div><div class="field-grid two-columns"><label class="field"><span>開始日期</span><input type="text" data-item-field="start" placeholder="2023/06" /></label><label class="field"><span>結束日期</span><input type="text" data-item-field="end" placeholder="至今" /></label></div><label class="field"><span>地點</span><input type="text" data-item-field="location" placeholder="台中市 / 遠端" /></label><label class="field"><span>成果與職責（每行一點）</span><textarea rows="5" data-item-field="description" placeholder="將首頁載入速度提升 35%&#10;建立共用元件庫，縮短開發時間"></textarea></label></article>
+  </template>
+
+  <template id="educationItemTemplate">
+    <article class="dynamic-item" data-item-type="education"><div class="dynamic-item-header"><strong>學歷</strong><div class="item-actions"><button type="button" class="move-button" data-move="up" title="往上移">↑</button><button type="button" class="move-button" data-move="down" title="往下移">↓</button><button type="button" class="remove-button" data-remove-item title="刪除">刪除</button></div></div><div class="field-grid two-columns"><label class="field"><span>學校</span><input type="text" data-item-field="school" placeholder="○○大學" /></label><label class="field"><span>科系 / 學位</span><input type="text" data-item-field="degree" placeholder="資訊工程學系 學士" /></label></div><div class="field-grid two-columns"><label class="field"><span>開始日期</span><input type="text" data-item-field="start" placeholder="2019/09" /></label><label class="field"><span>結束日期</span><input type="text" data-item-field="end" placeholder="2023/06" /></label></div><label class="field"><span>補充說明</span><textarea rows="3" data-item-field="description" placeholder="主修課程、GPA、社團或重要成果"></textarea></label></article>
+  </template>
+
+  <template id="projectsItemTemplate">
+    <article class="dynamic-item" data-item-type="projects"><div class="dynamic-item-header"><strong>專案作品</strong><div class="item-actions"><button type="button" class="move-button" data-move="up" title="往上移">↑</button><button type="button" class="move-button" data-move="down" title="往下移">↓</button><button type="button" class="remove-button" data-remove-item title="刪除">刪除</button></div></div><div class="field-grid two-columns"><label class="field"><span>專案名稱</span><input type="text" data-item-field="name" placeholder="萬用履歷產生器" /></label><label class="field"><span>使用技術</span><input type="text" data-item-field="tech" placeholder="JavaScript、CSS、HTML" /></label></div><label class="field"><span>專案連結</span><input type="text" data-item-field="url" placeholder="github.com/username/project" /></label><label class="field"><span>專案亮點（每行一點）</span><textarea rows="4" data-item-field="description" placeholder="支援三種履歷版型與即時預覽&#10;可備份 JSON 並輸出 PDF"></textarea></label></article>
+  </template>
+
+  <template id="certificationsItemTemplate">
+    <article class="dynamic-item compact-item" data-item-type="certifications"><div class="dynamic-item-header"><strong>證照 / 獎項</strong><div class="item-actions"><button type="button" class="move-button" data-move="up" title="往上移">↑</button><button type="button" class="move-button" data-move="down" title="往下移">↓</button><button type="button" class="remove-button" data-remove-item title="刪除">刪除</button></div></div><div class="field-grid two-columns"><label class="field"><span>名稱</span><input type="text" data-item-field="name" placeholder="TOEIC 900" /></label><label class="field"><span>年份 / 頒發單位</span><input type="text" data-item-field="detail" placeholder="2026・ETS" /></label></div></article>
+  </template>
+
+  <template id="languagesItemTemplate">
+    <article class="dynamic-item compact-item" data-item-type="languages"><div class="dynamic-item-header"><strong>語言能力</strong><div class="item-actions"><button type="button" class="move-button" data-move="up" title="往上移">↑</button><button type="button" class="move-button" data-move="down" title="往下移">↓</button><button type="button" class="remove-button" data-remove-item title="刪除">刪除</button></div></div><div class="field-grid two-columns"><label class="field"><span>語言</span><input type="text" data-item-field="name" placeholder="英文" /></label><label class="field"><span>程度</span><input type="text" data-item-field="level" placeholder="專業工作能力 / TOEIC 900" /></label></div></article>
+  </template>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
