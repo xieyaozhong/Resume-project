@@ -1,36 +1,101 @@
-name: Deploy to GitHub Pages
+name: Validate and deploy GitHub Pages
 
 on:
   push:
+    branches: [main]
+  pull_request:
     branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Materialize optimized source
+        run: bash scripts/materialize-optimization.sh
+
+      - name: Validate static app
+        run: |
+          node --check app.js
+          node tests/smoke.mjs
+          python - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+
+          class Validator(HTMLParser):
+              pass
+
+          required = ["index.html", "styles.css", "app.js"]
+          for filename in required:
+              path = Path(filename)
+              if not path.is_file() or path.stat().st_size == 0:
+                  raise SystemExit(f"Missing or empty required file: {filename}")
+
+          Validator().feed(Path("index.html").read_text(encoding="utf-8"))
+          print("Static app validation passed")
+          PY
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: validate
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Materialize optimized source
+        run: bash scripts/materialize-optimization.sh
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
+
+      - name: Prepare deployment artifact
+        run: |
+          mkdir -p _site
+          cp index.html styles.css app.js .nojekyll _site/
+          python - <<'PY'
+          import datetime
+          import json
+          import os
+          from pathlib import Path
+
+          health = {
+              "status": "ok",
+              "repository": os.environ.get("GITHUB_REPOSITORY"),
+              "commit": os.environ.get("GITHUB_SHA"),
+              "runId": os.environ.get("GITHUB_RUN_ID"),
+              "deployedAt": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+          }
+          Path("_site/health.json").write_text(
+              json.dumps(health, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          PY
 
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
 
       - name: Deploy
         id: deployment
