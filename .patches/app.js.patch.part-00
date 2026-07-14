@@ -1,0 +1,116 @@
+--- app.js
++++ app.js
+@@ -3,7 +3,10 @@
+ const STORAGE_KEY = "universal-resume-builder:v1";
+ const STATE_VERSION = 1;
+ const A4_HEIGHT_PX = 1122.52;
+-const MAX_PHOTO_BYTES = 2 * 1024 * 1024;
++const MAX_PHOTO_INPUT_BYTES = 8 * 1024 * 1024;
++const MAX_STORED_PHOTO_BYTES = 700 * 1024;
++const PHOTO_MAX_DIMENSION = 900;
++const MAX_JSON_BYTES = 5 * 1024 * 1024;
+ 
+ const labels = {
+   zh: {
+@@ -215,6 +218,11 @@
+   refs.zoomValue = document.getElementById("zoomValue");
+   refs.photoPreview = document.getElementById("photoPreview");
+   refs.toastRegion = document.getElementById("toastRegion");
++  refs.resumeHealth = document.getElementById("resumeHealth");
++  refs.completionLabel = document.getElementById("completionLabel");
++  refs.completionHint = document.getElementById("completionHint");
++  refs.completionBar = document.getElementById("completionBar");
++  refs.completionTrack = document.querySelector(".completion-track");
+ }
+ 
+ function bindStaticEvents() {
+@@ -225,7 +233,10 @@
+   document.getElementById("photoInput").addEventListener("change", handlePhotoUpload);
+   document.getElementById("importJsonInput").addEventListener("change", handleJsonImport);
+   document.getElementById("printBtn").addEventListener("click", () => window.print());
++  document.getElementById("mobilePrintBtn").addEventListener("click", () => window.print());
+   document.getElementById("exportJsonBtn").addEventListener("click", exportJson);
++  document.getElementById("exportTextBtn").addEventListener("click", exportPlainText);
++  document.getElementById("atsModeBtn").addEventListener("click", activateAtsMode);
+   document.getElementById("loadSampleBtn").addEventListener("click", loadSample);
+   document.getElementById("resetBtn").addEventListener("click", resetAll);
+   document.getElementById("removePhotoBtn").addEventListener("click", removePhoto);
+@@ -236,6 +247,11 @@
+   window.addEventListener("resize", debounce(() => {
+     if (window.innerWidth <= 820) fitPreview();
+   }, 150));
++  window.addEventListener("pagehide", flushPendingSave);
++  document.addEventListener("visibilitychange", () => {
++    if (document.visibilityState === "hidden") flushPendingSave();
++  });
++  window.addEventListener("beforeprint", () => renderPreview());
+ }
+ 
+ function handleInput(event) {
+@@ -455,6 +471,12 @@
+   saveTimer = window.setTimeout(saveState, immediate ? 50 : 450);
+ }
+ 
++function flushPendingSave() {
++  window.clearTimeout(saveTimer);
++  window.clearTimeout(renderTimer);
++  saveState();
++}
++
+ function saveState() {
+   try {
+     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+@@ -480,19 +502,41 @@
+ }
+ 
+ function normalizeState(input) {
+-  const normalized = deepMerge(clone(defaultState), input && typeof input === "object" ? input : {});
++  const normalized = deepMerge(clone(defaultState), isRecord(input) ? input : {});
+   normalized.version = STATE_VERSION;
++  if (!isRecord(normalized.settings)) normalized.settings = clone(defaultState.settings);
++  if (!isRecord(normalized.settings.visibility)) normalized.settings.visibility = clone(defaultState.settings.visibility);
++  if (!isRecord(normalized.personal)) normalized.personal = clone(defaultState.personal);
++  if (!isRecord(normalized.custom)) normalized.custom = clone(defaultState.custom);
++
++  Object.keys(defaultState.personal).forEach((key) => {
++    normalized.personal[key] = String(normalized.personal[key] || "");
++  });
++  normalized.summary = String(normalized.summary || "");
++  normalized.skills = String(normalized.skills || "");
++  normalized.custom.title = String(normalized.custom.title || "");
++  normalized.custom.content = String(normalized.custom.content || "");
++  normalized.custom.format = normalized.custom.format === "paragraph" ? "paragraph" : "bullets";
+ 
+   ["experience", "education", "projects", "certifications", "languages"].forEach((type) => {
+     if (!Array.isArray(normalized[type])) normalized[type] = [];
+-    normalized[type] = normalized[type].map((item) => ({
+-      ...createEmptyItem(type),
+-      ...(item && typeof item === "object" ? item : {}),
+-      id: item?.id || uid(),
+-    }));
++    const schema = createEmptyItem(type);
++    normalized[type] = normalized[type].slice(0, 50).map((item) => {
++      const source = item && typeof item === "object" && !Array.isArray(item) ? item : {};
++      const result = { ...schema, ...source, id: String(source.id || uid()) };
++      Object.keys(schema).forEach((key) => {
++        if (key !== "id") result[key] = String(result[key] || "");
++      });
++      return result;
++    });
+     if (normalized[type].length === 0) normalized[type].push(createEmptyItem(type));
+   });
+ 
++  normalized.settings.showPhoto = Boolean(normalized.settings.showPhoto);
++  normalized.settings.showIcons = Boolean(normalized.settings.showIcons);
++  Object.keys(defaultState.settings.visibility).forEach((key) => {
++    normalized.settings.visibility[key] = Boolean(normalized.settings.visibility[key]);
++  });
+   normalized.settings.accentColor = normalizeHex(normalized.settings.accentColor) || "#0f766e";
+   if (!labels[normalized.settings.language]) normalized.settings.language = "zh";
+   if (!["modern", "classic", "minimal"].includes(normalized.settings.template)) normalized.settings.template = "modern";
+@@ -507,6 +551,9 @@
+   const hasContent = hasResumeContent();
+ 
+   refs.preview.className = `resume-paper template-${state.settings.template} scale-${state.settings.fontScale}`;
++  document.title = state.personal.name.trim()
++    ? `${sta
