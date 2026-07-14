@@ -1,0 +1,480 @@
+/* Spark Luxury visual system */
+:root {
+  --luxury-midnight: #071522;
+  --luxury-midnight-soft: #102337;
+  --luxury-charcoal: #172232;
+  --luxury-ivory: #f6efe4;
+  --luxury-paper: #fffaf2;
+  --luxury-gold: #c8a45f;
+  --luxury-gold-light: #ead8a8;
+  --luxury-bronze: #8e6a36;
+  --luxury-ink: #172333;
+  --luxury-muted: #746d63;
+  --luxury-line: rgba(160, 119, 55, 0.3);
+  --shadow: 0 26px 72px rgba(3, 12, 23, 0.28), 0 0 0 1px rgba(207, 171, 99, 0.14);
+}
+
+body {
+  background:
+    radial-gradient(circle at 82% 10%, rgba(200, 164, 95, 0.14), transparent 26rem),
+    linear-gradient(145deg, #06111d 0%, #0b1a2a 46%, #132335 100%);
+}
+
+.topbar {
+  color: var(--luxury-ivory);
+  background: rgba(7, 21, 34, 0.94);
+  border-bottom-color: rgba(215, 181, 111, 0.34);
+  box-shadow: 0 12px 36px rgba(2, 9, 17, 0.28);
+}
+
+.brand-mark {
+  color: var(--luxury-midnight);
+  background:
+    radial-gradient(circle at 70% 28%, #fff7d9 0 4%, transparent 5%),
+    linear-gradient(145deg, #f1dda8, #b8873e);
+  border: 1px solid rgba(255, 245, 210, 0.7);
+  border-radius: 50%;
+  box-shadow: 0 0 0 5px rgba(200, 164, 95, 0.1), 0 9px 25px rgba(0, 0, 0, 0.36);
+  font-family: Georgia, "Noto Serif TC", serif;
+}
+
+.brand h1 {
+  font-family: Georgia, "Noto Serif TC", serif;
+  font-weight: 650;
+  letter-spacing: 0.03em;
+}
+
+.brand p,
+.save-status {
+  color: #c8c0b4;
+}
+
+.save-status::before {
+  background: var(--luxury-gold);
+  box-shadow: 0 0 8px rgba(200, 164, 95, 0.75);
+}
+
+.button {
+  border-radius: 999px;
+  letter-spacing: 0.01em;
+}
+
+.button-primary {
+  color: #0b1724;
+  background: linear-gradient(135deg, #ead9a9, #b98d47);
+  border-color: rgba(255, 244, 208, 0.7);
+  box-shadow: 0 8px 22px rgba(174, 127, 55, 0.28);
+}
+
+.button-primary:hover {
+  color: #08131f;
+  background: linear-gradient(135deg, #f2e3b9, #c59b57);
+}
+
+.topbar .button-ghost {
+  color: #eee7db;
+  background: rgba(255, 255, 255, 0.055);
+  border-color: rgba(218, 186, 121, 0.28);
+}
+
+.topbar .button-ghost:hover {
+  background: rgba(218, 186, 121, 0.12);
+  border-color: rgba(231, 201, 141, 0.48);
+}
+
+.editor-panel {
+  background:
+    radial-gradient(circle at 0 0, rgba(202, 164, 94, 0.1), transparent 23rem),
+    #f2ede5;
+  border-right-color: rgba(142, 106, 54, 0.22);
+}
+
+.editor-intro h2,
+.form-card-heading h3,
+.subsection-heading h4 {
+  color: var(--luxury-ink);
+  font-family: Georgia, "Noto Serif TC", serif;
+  font-weight: 650;
+}
+
+.editor-intro p,
+.completion > div:first-child,
+.field-hint,
+.photo-uploader p {
+  color: #756f66;
+}
+
+.completion-track {
+  background: rgba(126, 94, 45, 0.13);
+}
+
+.completion-track span {
+  background: linear-gradient(90deg, #8d6735, #d7b875);
+  box-shadow: 0 0 12px rgba(200, 164, 95, 0.35);
+}
+
+.section-nav-item {
+  color: #716a61;
+}
+
+.section-nav-item:hover,
+.section-nav-item.is-active {
+  color: #5c431f;
+  background: rgba(200, 164, 95, 0.17);
+  box-shadow: inset 0 0 0 1px rgba(164, 119, 48, 0.12);
+}
+
+.form-card {
+  background:
+    linear-gradient(rgba(255, 252, 247, 0.97), rgba(255, 250, 242, 0.97)),
+    var(--luxury-paper);
+  border-color: rgba(161, 119, 54, 0.22);
+  box-shadow: 0 8px 28px rgba(51, 39, 22, 0.06), inset 0 1px rgba(255, 255, 255, 0.8);
+}
+
+.eyebrow {
+  color: var(--luxury-bronze);
+  letter-spacing: 0.17em;
+}
+
+.field > span,
+.dynamic-item-header strong,
+.completion #completionLabel {
+  color: #40392f;
+}
+
+.field input,
+.field textarea,
+.field select,
+.color-field input[type="text"] {
+  color: var(--luxury-ink);
+  background: rgba(255, 253, 249, 0.96);
+  border-color: rgba(137, 103, 53, 0.27);
+}
+
+.field input:hover,
+.field textarea:hover,
+.field select:hover {
+  border-color: rgba(146, 108, 49, 0.55);
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
+  border-color: var(--luxury-gold);
+  box-shadow: 0 0 0 3px rgba(200, 164, 95, 0.14);
+}
+
+.switch-row,
+.photo-uploader,
+.dynamic-item {
+  background: rgba(244, 237, 226, 0.67);
+  border-color: rgba(150, 111, 50, 0.18);
+}
+
+.button-secondary {
+  color: #5e431d;
+  background: rgba(212, 177, 107, 0.16);
+  border-color: rgba(166, 121, 48, 0.22);
+}
+
+.preview-panel {
+  background:
+    radial-gradient(circle at 52% 5%, rgba(213, 177, 106, 0.13), transparent 24rem),
+    linear-gradient(145deg, #07131f, #111f2f 58%, #172636);
+}
+
+.preview-toolbar {
+  color: #eee7da;
+  background: rgba(8, 21, 34, 0.92);
+  border-bottom-color: rgba(213, 177, 106, 0.25);
+}
+
+.preview-toolbar span {
+  color: #bcb3a6;
+}
+
+.preview-toolbar .icon-button,
+.preview-toolbar .health-pill {
+  color: #e9dfcf;
+  background: rgba(255, 255, 255, 0.055);
+  border-color: rgba(213, 177, 106, 0.28);
+}
+
+.health-pill.is-good {
+  color: #ead9a7;
+  background: rgba(200, 164, 95, 0.12);
+  border-color: rgba(218, 184, 113, 0.38);
+}
+
+.health-pill.is-warning,
+#pageEstimate.is-warning {
+  color: #f0c984;
+}
+
+.resume-paper {
+  background: var(--luxury-paper);
+}
+
+/* The modern template becomes the premium Spark signature layout. */
+.template-modern {
+  --spark-gold: #c8a45f;
+  --spark-gold-light: #ead8a8;
+  --spark-navy: #071522;
+  --spark-navy-soft: #102337;
+  --spark-ivory: #fffaf2;
+  --spark-ink: #172333;
+}
+
+.template-modern .resume-root {
+  grid-template-columns: 64mm minmax(0, 1fr);
+  color: var(--spark-ink);
+  background: var(--spark-ivory);
+}
+
+.template-modern .resume-sidebar {
+  position: relative;
+  min-height: 297mm;
+  overflow: hidden;
+  padding: 15mm 9mm 13mm;
+  color: #eee8dc;
+  background:
+    radial-gradient(circle at 78% 10%, rgba(255, 231, 170, 0.2) 0 0.8mm, transparent 1mm),
+    radial-gradient(circle at 83% 14%, rgba(200, 164, 95, 0.18), transparent 22mm),
+    linear-gradient(160deg, var(--spark-navy) 0%, #0b1c2d 60%, #102438 100%);
+  box-shadow: inset -0.35mm 0 rgba(213, 177, 106, 0.58);
+}
+
+.template-modern .resume-sidebar::before {
+  content: "";
+  position: absolute;
+  top: 8mm;
+  right: 7mm;
+  width: 18mm;
+  height: 18mm;
+  border: 0.25mm solid rgba(218, 183, 112, 0.62);
+  border-radius: 50%;
+  box-shadow: 0 0 8mm rgba(200, 164, 95, 0.1);
+}
+
+.template-modern .resume-sidebar::after {
+  content: "";
+  position: absolute;
+  right: -21mm;
+  bottom: -5mm;
+  width: 78mm;
+  height: 28mm;
+  border-top: 0.55mm solid rgba(231, 199, 134, 0.74);
+  border-radius: 50%;
+  transform: rotate(-10deg);
+  box-shadow:
+    0 -1.2mm 0 -0.8mm rgba(200, 164, 95, 0.45),
+    0 -3mm 9mm rgba(207, 166, 88, 0.3);
+}
+
+.template-modern .resume-sidebar > * {
+  position: relative;
+  z-index: 1;
+}
+
+.template-modern .resume-main {
+  position: relative;
+  padding: 14mm 13mm 12mm;
+  background:
+    radial-gradient(circle at 94% 4%, rgba(210, 175, 106, 0.13) 0 0.65mm, transparent 0.8mm),
+    radial-gradient(circle at 94% 4%, rgba(210, 175, 106, 0.09), transparent 17mm),
+    linear-gradient(135deg, #fffdf8 0%, #f8f1e7 100%);
+}
+
+.template-modern .resume-main::before {
+  content: "LIGHT THE FIRE WITHIN";
+  display: block;
+  margin-bottom: 4.5mm;
+  color: var(--spark-gold);
+  font-size: 6.8pt;
+  font-weight: 800;
+  letter-spacing: 0.21em;
+}
+
+.template-modern .resume-photo {
+  width: 34mm;
+  height: 34mm;
+  margin: 1mm auto 8mm;
+  border: 0.7mm solid var(--spark-gold-light);
+  box-shadow: 0 0 0 1.4mm rgba(200, 164, 95, 0.08), 0 7mm 16mm rgba(0, 0, 0, 0.24);
+}
+
+.template-modern .resume-name {
+  margin-bottom: 2mm;
+  color: #fffaf0;
+  font-family: Georgia, "Noto Serif TC", serif;
+  font-size: 23pt;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+
+.template-modern .resume-role {
+  margin-bottom: 8mm;
+  color: var(--spark-gold-light);
+  font-size: 10pt;
+  font-weight: 650;
+  line-height: 1.55;
+}
+
+.template-modern .resume-sidebar .resume-section {
+  margin-bottom: calc(var(--section-gap) + 0.7mm);
+}
+
+.template-modern .resume-sidebar .resume-section-title {
+  position: relative;
+  padding: 0 0 2.1mm 5mm;
+  color: #f4ecdf;
+  border-bottom: 0.25mm solid rgba(218, 184, 113, 0.35);
+  font-family: Georgia, "Noto Serif TC", serif;
+  font-size: 10pt;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.template-modern .resume-sidebar .resume-section-title::before {
+  content: "✦";
+  position: absolute;
+  left: 0;
+  color: var(--spark-gold-light);
+  text-shadow: 0 0 3mm rgba(225, 187, 108, 0.7);
+}
+
+.template-modern .resume-sidebar .resume-contact-list {
+  gap: 2.5mm;
+  color: #ded7cc;
+}
+
+.template-modern .resume-sidebar .resume-contact-list li {
+  align-items: center;
+}
+
+.template-modern .resume-sidebar .contact-icon {
+  display: inline-grid;
+  width: 4.7mm;
+  height: 4.7mm;
+  place-items: center;
+  margin-right: 1.5mm;
+  color: var(--spark-gold-light);
+  border: 0.22mm solid rgba(213, 177, 106, 0.65);
+  border-radius: 50%;
+  font-size: 6.2pt;
+}
+
+.template-modern .resume-sidebar .resume-contact-list a,
+.template-modern .resume-sidebar .resume-contact-list span {
+  overflow-wrap: anywhere;
+}
+
+.template-modern .resume-sidebar .skill-label {
+  margin-bottom: 1.2mm;
+  color: var(--spark-gold-light);
+  font-size: var(--small-size);
+  letter-spacing: 0.025em;
+}
+
+.template-modern .resume-sidebar .skill-tags {
+  gap: 1.5mm;
+}
+
+.template-modern .resume-sidebar .skill-tag {
+  padding: 1.05mm 2.3mm;
+  color: #f4eee4;
+  background: rgba(255, 255, 255, 0.025);
+  border-color: rgba(213, 177, 106, 0.62);
+  box-shadow: inset 0 0 4mm rgba(200, 164, 95, 0.035);
+}
+
+.template-modern .resume-main .resume-section-title {
+  display: flex;
+  align-items: center;
+  gap: 3mm;
+  margin-bottom: 3.2mm;
+  color: var(--spark-ink);
+  font-family: Georgia, "Noto Serif TC", serif;
+  font-size: 12pt;
+  font-weight: 650;
+  letter-spacing: 0.025em;
+  text-transform: none;
+}
+
+.template-modern .resume-main .resume-section-title::after {
+  content: "";
+  height: 0.25mm;
+  flex: 1;
+  background: linear-gradient(90deg, var(--spark-gold), rgba(200, 164, 95, 0.08));
+}
+
+.template-modern .resume-main .resume-section-title::before {
+  content: "";
+  width: 2.2mm;
+  height: 2.2mm;
+  flex: 0 0 2.2mm;
+  background: linear-gradient(135deg, #eedca9, #a87834);
+  transform: rotate(45deg);
+  box-shadow: 0 0 3mm rgba(200, 164, 95, 0.32);
+}
+
+.template-modern .resume-main .resume-section {
+  margin-bottom: calc(var(--section-gap) - 0.7mm);
+}
+
+.template-modern .resume-main .resume-item {
+  position: relative;
+  margin-left: 1mm;
+  padding-left: 4mm;
+  border-left: 0.22mm solid rgba(180, 136, 67, 0.35);
+}
+
+.template-modern .resume-main .resume-item::before {
+  content: "";
+  position: absolute;
+  top: 1.5mm;
+  left: -1.25mm;
+  width: 2.2mm;
+  height: 2.2mm;
+  background: linear-gradient(135deg, #e7d097, #aa7935);
+  transform: rotate(45deg);
+}
+
+.template-modern .resume-main .resume-item h3 {
+  color: #172333;
+  font-size: 10.3pt;
+}
+
+.template-modern .resume-main .resume-item-subtitle {
+  color: var(--luxury-bronze);
+}
+
+.template-modern .resume-main .resume-meta {
+  color: #82786b;
+}
+
+.template-modern .resume-main .resume-description {
+  color: #4b5562;
+}
+
+.template-modern .resume-main .skill-tag {
+  color: #4d3a1e;
+  background: rgba(200, 164, 95, 0.09);
+  border-color: rgba(167, 122, 49, 0.32);
+}
+
+.template-modern .resume-main a {
+  text-decoration-color: rgba(159, 113, 42, 0.48);
+  text-underline-offset: 1mm;
+}
+
+@media print {
+  .template-modern .resume-sidebar,
+  .template-modern .resume-main,
+  .template-modern .resume-photo,
+  .template-modern .skill-tag {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
