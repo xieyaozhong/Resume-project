@@ -1,0 +1,93 @@
+--- index.html
++++ index.html
+@@ -3,8 +3,12 @@
+ <head>
+   <meta charset="UTF-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+-  <meta name="description" content="萬用履歷產生器：即時預覽、多版型、JSON 備份與 PDF 匯出。" />
++  <meta name="description" content="萬用履歷產生器：即時預覽、多版型、ATS 健檢、JSON 備份與 PDF 匯出。" />
+   <meta name="theme-color" content="#0f766e" />
++  <meta name="robots" content="index,follow" />
++  <meta property="og:title" content="萬用履歷產生器" />
++  <meta property="og:description" content="免安裝、資料不上傳，快速製作 ATS 友善履歷並輸出 PDF。" />
++  <meta property="og:type" content="website" />
+   <title>萬用履歷產生器</title>
+   <link rel="stylesheet" href="styles.css" />
+ </head>
+@@ -25,6 +29,8 @@
+     <div class="top-actions" aria-label="履歷操作">
+       <span id="saveStatus" class="save-status" role="status">已自動儲存</span>
+       <button class="button button-ghost" id="loadSampleBtn" type="button">載入範例</button>
++      <button class="button button-ghost" id="atsModeBtn" type="button" title="切換為單欄、無照片的 ATS 友善設定">ATS 模式</button>
++      <button class="button button-ghost" id="exportTextBtn" type="button">匯出 TXT</button>
+       <button class="button button-ghost" id="exportJsonBtn" type="button">備份 JSON</button>
+       <label class="button button-ghost file-button" for="importJsonInput">匯入 JSON</label>
+       <input id="importJsonInput" type="file" accept="application/json,.json" hidden />
+@@ -43,6 +49,10 @@
+         <div>
+           <h2>建立你的履歷</h2>
+           <p>資料只會儲存在你的瀏覽器，不會上傳至伺服器。</p>
++          <div class="completion" aria-label="履歷完成度">
++            <div><span id="completionLabel">履歷完成度 0%</span><span id="completionHint">尚未開始</span></div>
++            <div class="completion-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="completionBar"></span></div>
++          </div>
+         </div>
+         <button class="icon-button danger" id="resetBtn" type="button" title="清除全部資料" aria-label="清除全部資料">重設</button>
+       </section>
+@@ -129,14 +139,14 @@
+               <label class="button button-secondary file-button" for="photoInput">上傳照片</label>
+               <input id="photoInput" type="file" accept="image/png,image/jpeg,image/webp" hidden />
+               <button class="text-button" id="removePhotoBtn" type="button">移除照片</button>
+-              <p>建議使用正方形 JPG、PNG 或 WebP，檔案小於 2 MB。</p>
++              <p>支援 JPG、PNG 或 WebP；上傳後會自動縮圖壓縮，避免瀏覽器儲存空間不足。</p>
+             </div>
+           </div>
+ 
+           <div class="field-grid two-columns">
+             <label class="field">
+               <span>姓名 *</span>
+-              <input type="text" placeholder="王小明" data-bind="personal.name" />
++              <input type="text" placeholder="王小明" data-bind="personal.name" autocomplete="name" maxlength="80" />
+             </label>
+             <label class="field">
+               <span>職稱 / 目標職位</span>
+@@ -147,18 +157,18 @@
+           <div class="field-grid two-columns">
+             <label class="field">
+               <span>電子信箱</span>
+-              <input type="email" placeholder="name@example.com" data-bind="personal.email" />
++              <input type="email" placeholder="name@example.com" data-bind="personal.email" autocomplete="email" maxlength="160" />
+             </label>
+             <label class="field">
+               <span>電話</span>
+-              <input type="tel" placeholder="0912-345-678" data-bind="personal.phone" />
++              <input type="tel" placeholder="0912-345-678" data-bind="personal.phone" autocomplete="tel" maxlength="40" />
+             </label>
+           </div>
+ 
+           <div class="field-grid two-columns">
+             <label class="field">
+               <span>所在地</span>
+-              <input type="text" placeholder="台中市，台灣" data-bind="personal.location" />
++              <input type="text" placeholder="台中市，台灣" data-bind="personal.location" autocomplete="address-level1" maxlength="100" />
+             </label>
+             <label class="field">
+               <span>個人網站</span>
+@@ -323,15 +333,19 @@
+ 
+     <section class="preview-panel" id="previewPanel" aria-label="履歷預覽">
+       <div class="preview-toolbar">
+-        <div>
++        <div class="preview-summary">
+           <strong>即時預覽</strong>
+           <span id="pageEstimate">預估 1 頁</span>
+         </div>
+-        <div class="zoom-controls" aria-label="預覽縮放">
++        <div class="preview-toolbar-actions">
++          <button class="button button-primary mobile-print-button" id="mobilePrintBtn" type="button">PDF</button>
++          <span id="resumeHealth" class="health-pill" role="status" title="履歷內容健檢">健檢 0/6</span>
++          <div class="zoom-controls" aria-label="預覽縮放">
+           <button class="icon-button" id="zoomOutBtn" type="button" aria-label="縮小">−</button>
+           <span id="zoomValue">85%</span>
+           <button class="icon-button" id="zoomInBtn" type="button" aria-label="放大">＋</button>
+           <b
