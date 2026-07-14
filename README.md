@@ -5,12 +5,15 @@
 ## 功能
 
 - 三種 A4 履歷版型：現代雙欄、經典單欄、極簡留白
+- 一鍵 ATS 模式與純文字 TXT 匯出
+- 履歷完成度與內容健檢提示
 - 即時履歷預覽與縮放
 - 基本資料、專業摘要、工作經歷、學歷、技能、專案、證照、語言、自訂區段
 - 動態新增、刪除與調整項目順序
 - 主題色、字體密度、繁中／英文標題切換
 - 可選擇隱藏照片與聯絡圖示，提升 ATS 相容性
-- 瀏覽器自動儲存
+- 瀏覽器自動儲存與離開頁面前強制寫入
+- 照片自動縮圖壓縮，降低瀏覽器儲存失敗機率
 - JSON 匯入／匯出備份
 - 使用瀏覽器列印功能輸出 A4 PDF
 - 響應式介面，支援手機、平板與桌面瀏覽器
@@ -44,15 +47,15 @@ python -m http.server 8000
 
 ```text
 .
-├── index.html                   # 編輯器與預覽頁面
-├── styles.css                  # UI、履歷版型與列印樣式
-├── app.js                      # 狀態管理、預覽、匯入匯出
+├── index.html                  # 編輯器與預覽頁面
+├── styles.css                 # UI、履歷版型與列印樣式
+├── app.js                     # 狀態管理、預覽、匯入匯出
 └── .github/workflows/pages.yml # GitHub Pages 部署
 ```
 
 ## GitHub Pages
 
-推送到 `main` 分支後，工作流程會自動部署靜態網站。第一次使用時，請到 Repository Settings → Pages，確認來源設為 GitHub Actions。
+推送到 `main` 分支後，工作流程會先驗證 HTML 與 JavaScript，再只封裝必要的網站檔案並部署。第一次使用時，請到 Repository Settings → Pages，確認來源設為 GitHub Actions。部署成功後可開啟 `health.json` 查看實際上線的 commit 與部署時間。
 
 ## 開發原則
 
