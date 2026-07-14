@@ -1,0 +1,55 @@
+ate.custom.content.trim()) {
++    const content = state.custom.format === "bullets"
++      ? parseLines(state.custom.content).map((line) => `• ${line}`)
++      : state.custom.content.trim();
++    pushSection(state.custom.title.trim(), content);
++  }
++
++  return `${lines.join("\n").replace(/\n{3,}/g, "\n\n").trim()}\n`;
++}
++
+ function exportJson() {
+   const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+   const filename = `${slugify(state.personal.name || "resume")}-${new Date().toISOString().slice(0, 10)}.json`;
+@@ -862,11 +1107,18 @@
+   const file = event.target.files?.[0];
+   event.target.value = "";
+   if (!file) return;
++  if (file.size > MAX_JSON_BYTES) {
++    showToast("JSON 檔案超過 5 MB，無法匯入。", "error");
++    return;
++  }
+ 
+   const reader = new FileReader();
+   reader.onload = () => {
+     try {
+       const imported = JSON.parse(String(reader.result || ""));
++      if (!imported || typeof imported !== "object" || Array.isArray(imported)) {
++        throw new Error("Invalid resume payload");
++      }
+       state = normalizeState(imported);
+       refreshEntireEditor();
+       saveState();
+@@ -916,6 +1168,7 @@
+     button.classList.toggle("is-active", active);
+     button.setAttribute("aria-selected", String(active));
+   });
++  window.scrollTo({ top: 0, behavior: "smooth" });
+   if (view === "preview") requestAnimationFrame(fitPreview);
+ }
+ 
+@@ -1027,9 +1280,14 @@
+   target[last] = value;
+ }
+ 
++function isRecord(value) {
++  return Boolean(value && typeof value === "object" && !Array.isArray(value));
++}
++
+ function deepMerge(target, source) {
+   if (!source || typeof source !== "object") return target;
+   Object.keys(source).forEach((key) => {
++    if (["__proto__", "prototype", "constructor"].includes(key)) return;
+     const sourceValue = source[key];
+     if (Array.isArray(sourceValue)) {
+       target[key] = sourceValue;
